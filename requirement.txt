@@ -1,0 +1,27 @@
+// Home assignment in the first interview with Mr Quang
+10M keywords
+keyword[i] -> [token_1, token_2, .., token_m] // ~ 10 tokens.
+
+query_user -> [token_1, token_2, ..., token_n]
+|query_user| <= 300
+
+Filter(map_tokens_keyword, map_keyword_tokens_size, tokens_query): list[keyword]
+    count = map[keyword][int] // store 10M keywords
+    for token in tokens_query:
+        for keyword in map_tokens_keyword[token]:
+            count[keyword] += 1
+    ans = []
+    for keyword, cnt in count:
+        if cnt >= map_keyword_tokens_size[keyword]:
+            ans = append(ans, keyword)
+    return ans
+    WorstCase: O(10M)
+    
+// Keyword filtering servies.
+
+gateway: API::filter(tokens_query) -> list[keyword]
+client -> thread pool handle.
+core process and return result to gateway
+gateway return back to client
+
+C++20, threading.
