@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 struct Tokenizer {
     static std::vector<std::string> tokenize(const std::string& str) {
@@ -13,6 +14,8 @@ struct Tokenizer {
         while (iss >> token) {
             tokens.push_back(token);
         }
+        std::sort(tokens.begin(), tokens.end());
+        tokens.erase(std::unique(tokens.begin(), tokens.end()), tokens.end());
         return tokens;
     }
 };
