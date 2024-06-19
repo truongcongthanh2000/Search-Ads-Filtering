@@ -1,40 +1,48 @@
 #ifndef INDEXING_HPP
 #define INDEXING_HPP
 
-#include <string>
-#include <memory>
 #include <atomic>
-#include <thread>
 #include <chrono>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <thread>
+
 #include "word_index.hpp"
 
+namespace indexing {
+
 class Indexing {
-public:
+   public:
     Indexing(const std::string& filename);
     std::shared_ptr<WordIndex> getWordIndex();
     ~Indexing();
 
-private:
+   private:
     void reloadIndex();
     void scheduleReload();
 
     std::string filename;
-    std::shared_ptr<WordIndex> wordIndex;
+    std::shared_ptr<WordIndex> word_index;
     std::atomic<bool> stop;
     std::thread schedulerThread;
+    std::mutex index_mutex_;
 };
 
 Indexing::Indexing(const std::string& filename) : filename(filename), stop(false) {
-    wordIndex = std::make_shared<WordIndex>(filename);
+    word_index = std::make_shared<WordIndex>(filename);
     scheduleReload();
 }
 
 std::shared_ptr<WordIndex> Indexing::getWordIndex() {
-    return wordIndex;
+    std::lock_guard<std::mutex> lock(index_mutex_);
+    return word_index;
 }
 
 void Indexing::reloadIndex() {
-    wordIndex = std::make_shared<WordIndex>(filename);
+    auto new_word_index = std::make_shared<WordIndex>(filename);
+    std::lock_guard<std::mutex> lock(index_mutex_);
+    word_index.swap(new_word_index);
 }
 
 void Indexing::scheduleReload() {
@@ -55,4 +63,6 @@ Indexing::~Indexing() {
     }
 }
 
-#endif // INDEXING_HPP
+}  // namespace indexing
+
+#endif  // INDEXING_HPP

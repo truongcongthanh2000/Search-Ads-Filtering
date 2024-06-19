@@ -12,6 +12,7 @@ class HttpRequest : public HttpMessage {
    private:
     HttpMethod method_;
     std::string uri_;
+    std::string uri_raw_;
     std::string body_;
     std::string raw_request_str_;
     std::map<std::string, std::string> params_;
@@ -46,6 +47,10 @@ class HttpRequest : public HttpMessage {
         this->uri_ = uri;
     }
 
+    const std::string& get_uri_raw() const {
+        return this->uri_raw_;
+    }
+
     const std::string& operator[](const std::string& key) const {
         return get(key);
     }
@@ -62,6 +67,7 @@ class HttpRequest : public HttpMessage {
         std::istringstream iss(raw_request_str_.substr(start, end - start));
         std::string uri_raw;
         iss >> method_str >> uri_raw >> version_str;
+        uri_raw_ = utils::decode_url(uri_raw);
         method_ = string_to_http_method(method_str);
         version_ = string_to_http_version(version_str);
         utils::parseURL(uri_raw, uri_, params_);
