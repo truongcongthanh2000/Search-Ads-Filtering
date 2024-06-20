@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <random>
 
 #include "tokenizer.hpp"
 #include "utils.hpp"
@@ -17,6 +18,7 @@ class WordIndex {
     std::vector<std::string> keywords;
 
     std::vector<std::string> loadKeywords(const std::string& filename) {
+        static const int limit = 1e7;
         std::ifstream infile(filename);
         if (!infile.is_open()) {
             throw std::runtime_error("Could not open file");
@@ -26,6 +28,9 @@ class WordIndex {
         std::string line;
         while (std::getline(infile, line)) {
             keywords.emplace_back(line);
+        }
+        while (keywords.size() < limit) {
+            keywords.emplace_back(keywords[std::rand() % keywords.size()]);
         }
         return keywords;
     }
