@@ -24,9 +24,9 @@ This repo is the implementation of a simple filtering and indexing component in 
 
 ## Features
 - Run on Linux only
-- Indexing load the number keywords is 10M and it will load each 30 seconds once. *The original data I get from [Vietnamese Search Engine](https://github.com/greeneley/Vietnamese_Search_Engine/tree/master/data) contains upto 84k, so I expand some random keywords from original data until 10M*
+- Indexing load the number keywords is 10M and it will load each 30 seconds once. *The original data I get from [Vietnamese Search Engine](https://github.com/greeneley/Vietnamese_Search_Engine/tree/master/data) contains around 84k, so I expand some random keywords from original data until 10M*
 - More details about [server here](https://github.com/nguyenhien1994/simple-http-server?tab=readme-ov-file#features)
-- The number of queries used to benchmark is 34k
+- The number of queries used to benchmark is ~ 34k
 - The number of threads used in filtering is 4, and the number of tasks is 100
 
 ## Build code
