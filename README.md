@@ -24,10 +24,10 @@ This repo is the implementation of a simple filtering and indexing component in 
 
 ## Features
 - Run on Linux only
-- Indexing load the number keywords is 10M and it will load each 30 seconds once. *The original data I get from [Vietnamese Search Engine](https://github.com/greeneley/Vietnamese_Search_Engine/tree/master/data) contains upto 840k, so I expand some random keywords from original data until 10M*
+- Indexing load the number keywords is 10M and it will load each 30 seconds once. *The original data I get from [Vietnamese Search Engine](https://github.com/greeneley/Vietnamese_Search_Engine/tree/master/data) contains upto 84k, so I expand some random keywords from original data until 10M*
 - More details about [server here](https://github.com/nguyenhien1994/simple-http-server?tab=readme-ov-file#features)
 - The number of queries used to benchmark is 34k
-- The number of threads used in filtering is 10, and the number of tasks is 100
+- The number of threads used in filtering is 4, and the number of tasks is 100
 
 ## Build code
 To run this server, follow these steps:
@@ -43,9 +43,9 @@ cmake .. && make
 ## Usage
 First, move file keywords.txt from data directory: `cp ../data/keywords.txt .` to the build directory.
 
-And then, to start the server, run `./apiGateway 4 100`
+And then, to start the server, run `./apiGateway number_threads number_tasks`, ex: `./apiGateway 4 100`
 
-The server will start on port 8080 by default.
+The server will start on port `8080` by default.
 
 Access the demo API via: `localhost:8080/filter_single_thread/?query=....` or `localhost:8080/filter_multi_thread/?query=....`, just copy any query in `data/requests.txt` and paste it into `?query=....`
 
@@ -79,9 +79,9 @@ Space complexity: O(n)
 ```
 **Optimize 1:** The above code has cons in storing huge keywords, which can be all keywords in the worst case. So I divide all n keywords into sqrt(n) blocks, each containing sqrt(n) keywords. When traversing each block, I use [Sliding window technique](https://www.geeksforgeeks.org/window-sliding-technique/) for each token in the query to keep track of the current block. So I just need to use a counting array with size sqrt(n) to count the occurrence for each keyword.
 
-Time complexity: O($\frac{n}{sqrt(n)} \times (t \times sqrt(n))$) = O(n * t) in the average case
+Time complexity: O(n * t) in the average case
 
-Space complexity: O($sqrt(n)$)
+Space complexity: O(sqrt(n))
 ### Filtering with multithreading
 **Optimize 2:** As you can see that, the keywords are completely independent of each other, so I applied a [Square Root (Sqrt) Decomposition Algorithm](https://www.geeksforgeeks.org/square-root-sqrt-decomposition-algorithm/) in optimize 1. In addition, we can also apply parallel programming. Here I use a threadpool with the number of threads being 4 and the number of tasks being 100, with each task handling about $\frac{n}{100}$ keywords with code according to optimize 1.
 
