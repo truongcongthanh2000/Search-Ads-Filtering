@@ -1,4 +1,3 @@
-// Home assignment in the first interview with Mr Quang
 10M keywords
 keyword[i] -> [token_1, token_2, .., token_m] // ~ 10 tokens.
 

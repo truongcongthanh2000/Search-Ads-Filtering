@@ -43,11 +43,11 @@ cmake .. && make
 ## Usage
 First, move file keywords.txt from data directory: `cp ../data/keywords.txt .` to the build directory.
 
-And then, to start the server, run `./apiGateway`
+And then, to start the server, run `./apiGateway 4 100`
 
 The server will start on port 8080 by default.
 
-Access the demo API via: `localhost:8080/filter/?query=....`, just copy any query in `data/requests.txt` and paste it into `?query=....`
+Access the demo API via: `localhost:8080/filter_single_thread/?query=....` or `localhost:8080/filter_multi_thread/?query=....`, just copy any query in `data/requests.txt` and paste it into `?query=....`
 
 ## Algorithm
 ### Filtering with single thread
@@ -86,9 +86,20 @@ Space complexity: O($sqrt(n)$)
 **Optimize 2:** As you can see that, the keywords are completely independent of each other, so I applied a [Square Root (Sqrt) Decomposition Algorithm](https://www.geeksforgeeks.org/square-root-sqrt-decomposition-algorithm/) in optimize 1. In addition, we can also apply parallel programming. Here I use a threadpool with the number of threads being 4 and the number of tasks being 100, with each task handling about $\frac{n}{100}$ keywords with code according to optimize 1.
 
 ## Benchmark
-TBU
-
+I code simple benchmark with python, the code is located in the data folder, along with the queries.txt file used to send http requests.
+- On the Laptop with 16 cores and 16GB RAM. Here is the result
+```
+Type: single_thread
+Total requests: 34303
+Total time: 31689.58 seconds
+Requests per second (RPS): 1.08
+Type: multi_thread
+Total requests: 34303
+Total time: 8419.94 seconds
+Requests per second (RPS): 4.07
+```
+Essentially, multithreading is 4 times faster than single threads
 ## Thanks to
-It really hard to has this repo without contribution from public repo, I specially thanks to:
+It hard to have this repo without contributions from public repository, I especially thank:
 - [C++ HttpServer by nguyenhien1994](https://github.com/nguyenhien1994/simple-http-server)
 - [Data keywords and queries by greeneley in Vietnamese Search Engine](https://github.com/greeneley/Vietnamese_Search_Engine)

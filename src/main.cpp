@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <cassert>
 
 #include "gateway.hpp"
 #include "thread_pool.hpp"
@@ -31,7 +32,7 @@ std::vector<std::string> Filter(const WordIndex& word_index, const std::string& 
     };
 
     // remove all token that wordIndex does not contains, or list keyword outside with range [start, end)
-    for (int idx = (int)tokens.size() - 1; idx >= 0; idx--) {
+    for (int idx = tokens_size - 1; idx >= 0; idx--) {
         if (!word_index.contains(tokens[idx])) {
             remove_token(idx);
             continue;
@@ -84,7 +85,7 @@ std::vector<std::string> Filter(const WordIndex& word_index, const std::string& 
         }
 
         // list all keywords that has been counting all tokens
-        for (int idx = 0; idx < block_size; idx++) {
+        for (int idx = 0; idx < R - current_idx_keyword; idx++) {
             // convert index counting to index keyword
             int idx_keyword = idx + current_idx_keyword;
             if (count[idx] == word_index.get_token_size_by_keyword(idx_keyword)) {
@@ -101,7 +102,7 @@ std::vector<std::string> Filter(const WordIndex& word_index, const std::string& 
 std::string format_json(const std::string& query, const std::vector<std::string>& keywords) {
     std::ostringstream oss;
     oss << "{\n";
-    oss << "  \"query\": " << query << ",\n";
+    oss << "  \"query\": " << "\"" << query << "\",\n";
     oss << "  \"length\": " << keywords.size() << ",\n";
     oss << "  \"keyword\": [";
     for (size_t i = 0; i < keywords.size(); ++i) {
@@ -141,14 +142,14 @@ void APIGateway::handle_filter_multi_thread(const http_message::HttpRequest& req
     std::vector<std::future<std::vector<std::string>>> results;
     // Use threadpool with 4 threads and split n keywords to 100 tasks, each task will process (n/100) keywords
     int nkeywords = word_index->get_number_of_keywords();
-    int ntasks = 100;
+    int ntasks = get_number_tasks();
     int nkeywords_per_task = (nkeywords + ntasks - 1) / ntasks;
 
     try {
-        ThreadPool pool(4);
+        ThreadPool pool(get_number_threads());
         for (int start = 0; start < nkeywords;) {
             int end = std::min(start + nkeywords_per_task, nkeywords);
-            results.emplace_back(pool.enqueue([&word_index, &query, start, end] {
+            results.emplace_back(pool.enqueue([word_index, query, start, end] {
                 return Filter(*word_index, query, start, end);
             }));
             start = end;
@@ -172,9 +173,11 @@ void APIGateway::handle_filter_multi_thread(const http_message::HttpRequest& req
     std::cout << utils::time() << " Execution time = " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << " milliseconds" << std::endl;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    int number_threads = std::stoi(argv[1]);
+    int number_tasks = std::stoi(argv[2]);
     // Example setup: assuming 'keywords.txt' is the file containing the keywords and tokens
-    APIGateway apiGateway("keywords.txt", 8080);
+    APIGateway apiGateway("keywords.txt", 8080, number_threads, number_tasks);
     apiGateway.register_handler("/filter_single_thread/", [&apiGateway](const http_message::HttpRequest& request, http_message::HttpResponse& response) {
         apiGateway.handle_filter_single_thread(request, response);
     });
