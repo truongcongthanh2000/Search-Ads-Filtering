@@ -57,7 +57,6 @@ def send_http_requests_concurrently(strings):
             end_times = [result[4] for result in results[key]]
             total_time = 0
             for i in range(len(start_times)):
-                total_length += lengths[i]
                 total_time += end_times[i] - start_times[i]
             rps = total_requests / total_time if total_time > 0 else 0
             
