@@ -1,13 +1,13 @@
 # Search Ads Filtering With Multithreading
-In Search Ads, there are many systems you may know such as Google Ads, CocCoc ads, .... Each system will have different components. But for me, it should has 4 main parts
-- Indexing: Load everything such as keywords, adverts, campaign ... in the system before serve any request to show ads based on the query of User.
+In Search Ads, there are many systems you may know such as Google Ads, CocCoc ads, .... Each system will have different components. But for me, it should have 4 main parts
+- Indexing: Load everything such as keywords, adverts, and campaigns ... in the system before serving any request to show ads based on the query of Users.
 - Matching: Focus on how the keyword can match with the search query
-- Ranking: Sort the list matching keywords through strategy help to improve quality of ads
-- Pricing: Use auction price model to charge for ads to be displayed.
+- Ranking: Sort the list matching keywords through strategy help to improve the quality of ads
+- Pricing: Use the auction price model to charge for ads to be displayed.
 
-For a large system like CocCoc, which has 30 milions of Users, or Google, which has a billion of Users. It will lead to the number of keywords really huge, we cannot take all that keywords to check matching with the search query. That is why we have a component filtering before matching to list all keyword can match the query.
+For a large system like CocCoc, which has 30 million of Users, or Google, which has a billion Users. It will lead to the number of keywords being huge, we cannot take all those keywords to check matching with the search query. That is why we have a component filtering before matching to list all keywords that can match the query.
 
-Filtering component just remove some keyword that we sure it cannot match with the search query within a reasonable time. The fewer keywords that have to be checked to match the search query, the lower the latency. 
+Filtering component just removes some keywords that we are sure cannot match with the search query within a reasonable time. The fewer keywords that have to be checked to match the search query, the lower the latency.
 
 This repo is the implementation of a simple filtering and indexing component in Search Ads system with multithreading in C++.
 
@@ -47,7 +47,7 @@ And then, to start the server, run `./apiGateway number_threads number_tasks`, e
 
 The server will start on port `8080` by default.
 
-Access the demo API via: `localhost:8080/filter_single_thread/?query=....` or `localhost:8080/filter_multi_thread/?query=....`, just copy any query in `data/requests.txt` and paste it into `?query=....`
+Access the demo API via: `localhost:8080/filter_single_thread/?query=....` or `localhost:8080/filter_multi_thread/?query=....`, just copy any query in `data/queries.txt` and paste it into `?query=....`
 
 ## Algorithm
 ### Filtering with single thread
